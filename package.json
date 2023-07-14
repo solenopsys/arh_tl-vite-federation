@@ -1,0 +1,22 @@
+{
+  "name": "@solenopsys/federation-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "builders": "builders.json",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@angular-devkit/architect": "^0.1601.0",
+    "@angular-devkit/build-angular": "^16.1.0",
+    "@angular-devkit/core": "^16.1.0"
+  },
+  "devDependencies": {
+    "tsc": "^2.0.4",
+    "typescript": "^5.1.3"
+  }
+}
