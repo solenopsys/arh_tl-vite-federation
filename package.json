@@ -1,22 +1,67 @@
 {
-  "name": "@solenopsys/federation-builder",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "builders": "builders.json",
-  "scripts": {
-    "build": "tsc"
+  "name": "@solenopsys/vite-plugin-angular",
+  "version": "16.1.0",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "angular",
+    "vite"
+  ],
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/nitedani/vite-plugin-angular"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "exports": {
+    "./plugin": "./lib/plugin/index.js",
+    "./server": "./lib/server/index.js",
+    "./client": "./lib/client/index.js",
+    "./hmr": "./lib/hmr/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "plugin": [
+        "lib/plugin/index.d.ts"
+      ],
+      "server": [
+        "lib/server/index.d.ts"
+      ],
+      "client": [
+        "lib/client/index.d.ts"
+      ],
+      "hmr": [
+        "lib/hmr/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "lib"
+  ],
   "dependencies": {
-    "@angular-devkit/architect": "^0.1601.0",
-    "@angular-devkit/build-angular": "^16.1.0",
-    "@angular-devkit/core": "^16.1.0"
+    "@angular-devkit/build-angular": "^16.1.4",
+    "@angular/compiler": "^16.1.5",
+    "@angular/compiler-cli": "^16.1.5",
+    "@angularclass/hmr": "^3.0.0",
+    "@babel/core": "^7.22.9",
+    "@ngtools/webpack": "^16.1.4",
+    "@nitedani/angular-renderer-core": "^16.1.0",
+    "@swc/core": "1.3.3",
+    "defu": "^6.1.2",
+    "swc-ast-helpers": "^0.2.2",
+    "vite-plugin-checker": "^0.6.1"
+  },
+  "peerDependencies": {
+    "vite": "*"
   },
   "devDependencies": {
-    "tsc": "^2.0.4",
-    "typescript": "^5.1.3"
+    "@types/node": "^18.16.19",
+    "rimraf": "^3.0.2",
+    "typescript": "5.1.6"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "arrowParens": "avoid"
   }
 }

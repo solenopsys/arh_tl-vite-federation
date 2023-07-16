@@ -1,12 +1,9 @@
 {
+    "extends": "./tsconfig.json",
+    "include": [
+      "./src/plugin"
+    ],
     "compilerOptions": {
-        "rootDir": "./src",
-        "baseUrl": "./src",
-        // "composite": true,
-        "types": [
-            "vite/client"
-        ],
-        "strictNullChecks": true,
         "outDir": "lib",
         "module": "esnext",
         "target": "ESNext",
@@ -20,15 +17,8 @@
         "noImplicitThis": true,
         "skipLibCheck": true,
         "noImplicitAny": false,
+        "strictNullChecks": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
-    },
-    "exclude": [
-        "node_modules",
-        "lib",
-        "examples"
-    ],
-    "include": [
-      "./src"
-    ]
+    }
 }
