@@ -14,7 +14,7 @@ export const TsCompilerPlugin: Plugin = {
     },
 
     resolveId(id) {
-        console.log('resolve', id)
+        //console.log('resolve', id)
         if (id === '/@angular/compiler') {
             return this.resolve('@angular/compiler');
         }
