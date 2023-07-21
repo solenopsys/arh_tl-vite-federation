@@ -13,10 +13,8 @@ export class AngularImportCompilerComponents extends Visitor {
         if (
           item.specifiers.some(imp =>
             [
-              'renderPage',
               'platformBrowserDynamic',
               'platformBrowser',
-              'bootstrapApplication',
             ].includes(imp.local.value)
           )
         ) {

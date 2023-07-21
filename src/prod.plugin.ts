@@ -25,7 +25,7 @@ interface EmitFileResult {
 }
 type FileEmitter = (file: string) => Promise<EmitFileResult | undefined>;
 
-export const ProductionPlugin = (): Plugin[] => {
+export const ProductionPlugin = (): Plugin => {
   const tsconfigPath = join(cwd(), 'tsconfig.json');
   const workspaceRoot = cwd();
 
@@ -61,8 +61,7 @@ export const ProductionPlugin = (): Plugin[] => {
     );
   }
 
-  return [
-    {
+  return{
       name: 'vite-plugin-angular-prod',
       enforce: 'pre',
       apply(config, env) {
@@ -172,39 +171,37 @@ export const ProductionPlugin = (): Plugin[] => {
 
         return undefined;
       },
-    },
-    OptimizerPlugin,
-  ];
-};
-
+    };
+}
 export function createFileEmitter(
   program: ts.BuilderProgram,
   transformers: ts.CustomTransformers = {},
   onAfterEmit?: (sourceFile: ts.SourceFile) => void
 ): FileEmitter {
-  return async (file: string) => {
-    const sourceFile = program.getSourceFile(file);
-    if (!sourceFile) {
-      return undefined;
-    }
-
-    let code: string = '';
-    program.emit(
-      sourceFile,
-      (filename, data) => {
-        if (/\.[cm]?js$/.test(filename)) {
-          if (data) {
-            code = data;
-          }
+    return async (file: string) => {
+        const sourceFile = program.getSourceFile(file);
+        if (!sourceFile) {
+            return undefined;
         }
-      },
-      undefined /* cancellationToken */,
-      undefined /* emitOnlyDtsFiles */,
-      transformers
-    );
 
-    onAfterEmit?.(sourceFile);
+        let code: string = '';
+        program.emit(
+            sourceFile,
+            (filename, data) => {
+                if (/\.[cm]?js$/.test(filename)) {
+                    if (data) {
+                        code = data;
+                    }
+                }
+            },
+            undefined /* cancellationToken */,
+            undefined /* emitOnlyDtsFiles */,
+            transformers
+        );
 
-    return { code, dependencies: [] };
-  };
+        onAfterEmit?.(sourceFile);
+
+        return {code, dependencies: []};
+    };
+
 }
