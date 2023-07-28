@@ -16,10 +16,11 @@ import {
   createExpressionStatement,
   createIdentifer,
   createImportDefaultSpecifier,
-  createKeyValueProperty,
+  createKeyValueProperty, createObjectExpression,
   createSpan,
-  createStringLiteral,
+  createStringLiteral, createVariableDeclaration,
 } from 'swc-ast-helpers';
+import * as swc from "@swc/core";
 
 const randomIdentifier = () =>
   Math.random().toString(36).substring(2, 15).replace(/\d/g, '');
@@ -43,7 +44,8 @@ export class AngularComponents extends Visitor {
   override visitTsTypes(nodes: TsType[]): TsType[] {
     return nodes;
   }
-  override visitTsType(nodes: TsType): TsType {
+  override visitTsType(nodes: any): TsType {
+
     return nodes;
   }
   override visitModuleItems(items: ModuleItem[]): ModuleItem[] {

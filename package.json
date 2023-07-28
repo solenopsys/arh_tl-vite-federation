@@ -20,6 +20,7 @@
   "devDependencies": {
     "bumpp": "^8.2.1",
     "turbo": "^1.10.7",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite-plugin-dts": "^3.3.1"
   }
 }

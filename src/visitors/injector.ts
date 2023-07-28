@@ -6,13 +6,13 @@ import {
     ModuleItem,
     NamedImportSpecifier,
     TsParameterProperty,
-    TsType,
+    TsType, VariableDeclarator,
 } from '@swc/core';
 import {Visitor} from '@swc/core/Visitor.js';
 import {
     createIdentifer,
-    createImportSpecifier,
-    createSpan,
+    createImportSpecifier, createKeyValueProperty, createObjectExpression,
+    createSpan, createStringLiteral, createVariableDeclaration,
     isCallExpression,
     isIdentifer,
     isImportDeclaration,
@@ -80,8 +80,8 @@ export class AngularInjector extends Visitor {
             if (
                 isTsTypeAnnotation(node.param.typeAnnotation) &&
                 isTsTypeReference(node.param.typeAnnotation.typeAnnotation) &&
-                isIdentifer(node.param.typeAnnotation.typeAnnotation.typeName)&&
-                this.beforeClass?.decorators?.length>0 // todo need refactor
+                isIdentifer(node.param.typeAnnotation.typeAnnotation.typeName) &&
+                this.beforeClass?.decorators?.length > 0 // todo need refactor
             ) {
                 node.decorators = node.decorators ?? [];
                 node.decorators.push({
@@ -112,11 +112,14 @@ export class AngularInjector extends Visitor {
         return node;
     }
 
-    override visitTsTypes(nodes: TsType[]): TsType[] {
+    override visitTsTypes(nodes: (TsType | any)[]): TsType[] {
+
+
+
         return nodes;
     }
 
-    override visitTsType(nodes: TsType): TsType {
-        return nodes;
+    override visitTsType(node: TsType | any): TsType | any {
+        return node;
     }
 }

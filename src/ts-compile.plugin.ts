@@ -1,13 +1,31 @@
 import {Plugin} from 'vite';
-import {JsMinifyOptions, minify, plugins, Program, transform} from "@swc/core";
+import {JsMinifyOptions, minify, Output, plugins, Program, transform} from "@swc/core";
 import {AngularComponents, AngularInjector} from "./visitors";
+import {TypesCollector} from "./visitors/types-map";
+import {injectStubs} from "./stubs-injector";
+import {loadPackageJson, loadViteMetadata, mapping} from "./nms";
 
 
 export const TsCompilerPlugin: Plugin = {
+
     name: 'vite-plugin-ts-compile-plugin',
     enforce: "pre",
 
     config(_userConfig, env) {
+        console.log("CONFIG", _userConfig, env)
+
+
+
+        const dir = "C:\\dev\\sources\\MAIN\\temp5\\frontends"
+
+        let conf = loadViteMetadata(dir);
+        let map = mapping(conf);
+        console.log(map)
+        for (const key in map) {
+            const value = map[key];
+            const pkg = loadPackageJson(dir, value);
+            console.log("PKG",value, pkg?.typings)
+        }
         return {
             esbuild: false,
         };
@@ -25,21 +43,47 @@ export const TsCompilerPlugin: Plugin = {
     },
 
     transform(code, id: any) {
+
+
+        if (id.includes('node_modules')) {
+          //  console.log("MODULE", id)
+        }
         if (id.endsWith('.ts')) {
-            return swcTransform({
-                code,
-                id,
-                isSsr: false,
-                isProduction: false,
+
+
+            return new Promise((resolve) => {
+                let typesCollector = new TypesCollector();
+                let promise: Promise<Output | undefined> = swcTransform({
+                    code,
+                    id,
+                    isSsr: false,
+                    isProduction: false,
+                    typesCollector: typesCollector
+                });
+
+
+                promise.then((output) => {
+                    let injectMap = typesCollector.getTypesMap();
+
+                    let code= output?.code;
+                    if(output?.code)
+                        code=injectStubs(injectMap,output?.code)
+                    resolve({
+                        code: code,
+                        map: output?.map,
+                    })
+                })
+
             });
+
         }
     }
 
 
 }
 
-export const swcTransform = async ({code, id, isSsr, isProduction}) => {
-    console.log("PROCESING", id)
+export const swcTransform = async ({code, id, isSsr, isProduction, typesCollector}): Promise<Output | undefined> => {
+    //  console.log("PROCESING", id)
     const minifyOptions: JsMinifyOptions = {
         compress: isProduction,
         mangle: isProduction,
@@ -51,6 +95,7 @@ export const swcTransform = async ({code, id, isSsr, isProduction}) => {
     };
 
     if (id.includes('node_modules')) {
+
         if (isProduction) {
             return minify(code, minifyOptions);
         }
@@ -70,6 +115,7 @@ export const swcTransform = async ({code, id, isSsr, isProduction}) => {
     return transform(code, {
         sourceMaps: !isProduction,
         jsc: {
+            baseUrl: './',
             target: 'es2020',
             parser: {
                 syntax: 'typescript',
@@ -86,14 +132,12 @@ export const swcTransform = async ({code, id, isSsr, isProduction}) => {
         minify: isProduction,
         plugin: plugins([
             (m: Program) => {
-                const angularComponentPlugin = new AngularComponents({
-                    sourceUrl: id,
-                });
-                return angularComponentPlugin.visitProgram(m);
+                return new AngularComponents({sourceUrl: id,}).visitProgram(m)
             },
             (m: Program) => {
-                const angularInjectorPlugin = new AngularInjector();
-                return angularInjectorPlugin.visitProgram(m);
+                return new AngularInjector().visitProgram(m);
+            }, (m: Program) => {
+                return typesCollector.visitProgram(m);
             },
         ]),
     });
