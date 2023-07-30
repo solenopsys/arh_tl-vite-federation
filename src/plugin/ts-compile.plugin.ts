@@ -2,9 +2,9 @@ import {Plugin} from 'vite';
 import {JsMinifyOptions, minify, Output, plugins, Program, transform} from "@swc/core";
 import {AngularComponents, AngularInjector} from "./visitors";
 import {TypesCollector} from "./visitors/types-map";
-import {injectStubs} from "./stubs-injector";
-import {loadPackageJson, loadViteMetadata, mapping} from "./nms";
-import {DtsScanner} from "./parser";
+import {injectStubs} from "./tools/stubs-injector";
+import {loadPackageJson, loadViteMetadata, mapping} from "./tools/nms";
+import {DtsScanner} from "./tools/parser";
 import {join} from "@angular/compiler-cli";
 
 const CACHE: { [key: string]: any } = {};
@@ -17,39 +17,39 @@ export const TsCompilerPlugin: Plugin = {
     enforce: "pre",
 
 
-    async config(_userConfig, env) {
+    async config(_userConfig, env:any) {
         // console.log("CONFIG", _userConfig, env)
+        const isBuild = env.command === 'build';
 
+        if (!isBuild  ) {
 
-        const dir = "C:\\dev\\sources\\MAIN\\temp5\\frontends"
+            const dir = "C:\\dev\\sources\\MAIN\\temp5\\frontends"
 
-        const allow = ["@ngxs/store","moment"]
+            const allow = ["@ngxs/store", "moment"]
 
-        let conf = loadViteMetadata(dir);
-        let map = mapping(conf);
-        console.log(map)
-        for (const key in map) {
-            const value = map[key];
-            const pkg = loadPackageJson(dir, value);
-            console.log("PKG", value, pkg?.typings)
-            if (allow.includes(value)) {
-                MAPPING[key] = value;
+            let conf = loadViteMetadata(dir);
+            let map = mapping(conf);
 
-                if (value && pkg?.typings) {
-                    let dtsScanner = new DtsScanner();
-                    let file = pkg?.typings.replace(".d.ts", "");
-                    const fp = join( "./node_modules/", value, file)
+            for (const key in map) {
+                const value = map[key];
+                const pkg = loadPackageJson(dir, value);
 
-                    const res = await dtsScanner.startParse(dir, fp);
-                    CACHE[value] = res;
+                if (allow.includes(value)) {
+                    MAPPING[key] = value;
+
+                    if (value && pkg?.typings) {
+                        let dtsScanner = new DtsScanner();
+                        let file = pkg?.typings.replace(".d.ts", "");
+                        const fp = join("./node_modules/", value, file)
+
+                        const res = await dtsScanner.startParse(dir, fp);
+                        CACHE[value] = res;
+                    }
+
                 }
 
             }
-
         }
-
-        console.log("MAPPING", MAPPING)
-        console.log("CACHE", CACHE)
 
         return {
             esbuild: false,
@@ -72,13 +72,12 @@ export const TsCompilerPlugin: Plugin = {
 
         if (id.includes('node_modules')) {
 
-            const map=MAPPING;
+            const map = MAPPING;
             for (const key in map) {
                 const value = map[key];
                 if (id.includes(key)) {
                     let mp = CACHE[value];
                     if (mp) {
-                        console.log("FOUND", key, mp)
 
                         return injectStubs(mp, code)
                     }

@@ -7,7 +7,6 @@ import * as fs from 'fs';
 function checkVariantFilesExist(dir: string, fn: string): string | null {
     const variantFiles = [fn + ".d.ts", fn + "\\index.d.ts"];
 
-    console.log("CHECKING", variantFiles)
 
     for (let i = 0; i < variantFiles.length; i++) {
         const filePath = join(dir, variantFiles[i]);
