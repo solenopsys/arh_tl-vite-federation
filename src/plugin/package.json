@@ -1,5 +1,5 @@
 {
-  "name": "@solenopsys/vite-micro-federation",
+  "name": "@solenopsys/vite-federation-plugin",
   "version": "0.1.3",
   "description": "Vite plugin for Solenopsys monorepo",
   "type": "module",
