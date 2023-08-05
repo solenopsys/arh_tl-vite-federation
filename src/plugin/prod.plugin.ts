@@ -123,6 +123,8 @@ export const ProductionPlugin = (): Plugin => {
             enableResourceInlining: false,
           }
         );
+
+      //  console.log("ROOT NAME")
         rootNames = rn;
         compilerOptions = tsCompilerOptions;
         host = ts.createIncrementalCompilerHost(compilerOptions);
@@ -139,7 +141,9 @@ export const ProductionPlugin = (): Plugin => {
         }
 
         if (/\.[cm]?tsx?$/.test(id)) {
-          const result = await fileEmitter!(id);
+           // console.log("\nBABEL ",code)
+
+            const result = await fileEmitter!(id);
           const data = result?.code ?? '';
           const forceAsyncTransformation =
             /for\s+await\s*\(|async\s+function\s*\*/.test(data);
@@ -179,6 +183,7 @@ export function createFileEmitter(
   onAfterEmit?: (sourceFile: ts.SourceFile) => void
 ): FileEmitter {
     return async (file: string) => {
+       // console.log("\nEMIT FILE ",file)
         const sourceFile = program.getSourceFile(file);
         if (!sourceFile) {
             return undefined;
@@ -200,6 +205,7 @@ export function createFileEmitter(
         );
 
         onAfterEmit?.(sourceFile);
+    //    console.log("\nCODE ",code)
 
         return {code, dependencies: []};
     };

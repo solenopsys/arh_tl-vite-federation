@@ -16,18 +16,25 @@ export const TsCompilerPlugin: Plugin = {
     name: 'vite-plugin-ts-compile-plugin',
     enforce: "pre",
 
+    apply(config, env) {
+        const isBuild = env.command === 'build';
+        const isSsrBuild = env.ssrBuild === true;
+        return !isBuild || isSsrBuild;
+    },
 
-    async config(_userConfig, env:any) {
+
+    async config(_userConfig, env: any) {
         // console.log("CONFIG", _userConfig, env)
         const isBuild = env.command === 'build';
 
-        if (!isBuild  ) {
+        if (!isBuild) {
 
             const dir = "C:\\dev\\sources\\MAIN\\temp5\\frontends"
 
             const allow = ["@ngxs/store", "moment"]
 
             let conf = loadViteMetadata(dir);
+
             let map = mapping(conf);
 
             for (const key in map) {
@@ -95,6 +102,7 @@ export const TsCompilerPlugin: Plugin = {
                     code,
                     id,
                     isSsr: false,
+
                     isProduction: false,
                     typesCollector: typesCollector
                 });
@@ -106,6 +114,11 @@ export const TsCompilerPlugin: Plugin = {
                     let code = output?.code;
                     if (output?.code)
                         code = injectStubs(injectMap, output?.code)
+
+
+                    if (code && id.endsWith('modules-controller.ts'))
+                        code = code.replace("import(", "import(/* @vite-ignore */ ")
+
                     resolve({
                         code: code,
                         map: output?.map,
@@ -160,11 +173,16 @@ export const swcTransform = async ({code, id, isSsr, isProduction, typesCollecto
                 tsx: false,
                 decorators: true,
                 dynamicImport: true,
+
+
             },
             transform: {
                 decoratorMetadata: true,
                 legacyDecorator: true,
+
+
             },
+
             minify: minifyOptions,
         },
         minify: isProduction,

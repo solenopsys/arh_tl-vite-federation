@@ -3,5 +3,11 @@
   "type": "module",
   "version": "0.0.0",
   "description": "Vite plugin to create a federated entry point",
-  "main": "index.ts"
+  "main": "index.ts",
+  "dependencies": {
+    "zone.js": "^0.13.1"
+  },
+  "run": {
+    "build": "esbuild index.ts --bundle --outfile=out.js --format=esm"
+  }
 }

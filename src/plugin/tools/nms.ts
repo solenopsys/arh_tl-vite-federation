@@ -12,7 +12,10 @@ type Conf = { optimized: { [key: string]: { file: string, src: string } } };
 export function loadViteMetadata(baseDir: string): Conf {
     const filePath = `./${NODE_MODULES}/${VITE_METADATA}`;
     const file = join(baseDir, filePath);
-  //  console.log("FILE", file)
+    const fileExists =  fs.existsSync(file);
+    if(!fileExists){
+        return {optimized: {}};
+    }
 
     const jsonData = fs.readFileSync(file, 'utf8');
     return JSON.parse(jsonData);
