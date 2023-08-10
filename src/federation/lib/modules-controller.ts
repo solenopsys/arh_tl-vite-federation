@@ -17,6 +17,9 @@ export class ModulesController {
             console.log("MODULE ALREADY LOADED",name)
             return Promise.resolve(this.modules[name]);
         }else{
+            // loadRemoteModule({remoteName: name, exposedModule: "./module"}).then((module)=>{
+            //
+            // }
             let promise = import( modName );
             promise.then((module)=>{
                 this.registerModule(name,module);

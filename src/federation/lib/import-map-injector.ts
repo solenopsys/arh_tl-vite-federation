@@ -1,10 +1,10 @@
 export type ImportMap = {
-    import: { [name: string]: string }
+    imports: { [name: string]: string }
     scopes: { [path: string]: { [name: string]: string } }
 }
 
 export class ImportMapInjector {
-    private importMap: ImportMap = {import: {}, scopes: {}} as ImportMap;
+    private importMap: ImportMap = {imports: {}, scopes: {}} as ImportMap;
 
     constructor(private document: any) {
     }
@@ -15,10 +15,17 @@ export class ImportMapInjector {
 
     public injectMap() {
         const im = this.findImportMap();
+       let beforeMap = JSON.parse(im.textContent);
+        if( beforeMap?.imports){
+            for (const beforeMapKey in beforeMap.imports) {
+                this.importMap.imports[beforeMapKey]=beforeMap.imports[beforeMapKey]
+                this.importMap.scopes=beforeMap.scopes;
+            }
+        }
         im.textContent = JSON.stringify(this.importMap);
     }
 
     public addModule(name: string, path: string) {
-        this.importMap.import[name] = path;
+        this.importMap.imports[name] = path;
     }
 }
