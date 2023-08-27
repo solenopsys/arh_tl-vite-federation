@@ -19,7 +19,7 @@ const moduleLoader = new ModulesController(importInjector,devLoader);
 // @ts-ignore
 const projectName= import.meta.env.MODE;
 console.log("ENTRY",projectName);
-const path = `/endpoints/new/${projectName}`;
+const path = `/endpoints/solenopsys/${projectName}`;
 const entryPath=`${path}/entry.json`;
 
 
