@@ -1,8 +1,0 @@
-{
-    "compilerOptions": {
-        "module": "es2022",
-        // ...other options...
-        "moduleResolution": "node16",
-        "allowSyntheticDefaultImports": true
-    }
-}
