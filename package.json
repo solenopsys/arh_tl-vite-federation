@@ -1,6 +1,6 @@
 {
   "name": "@solenopsys/vite-federation-plugin",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Vite plugin for Solenopsys monorepo",
   "type": "module",
   "dependencies": {
@@ -14,10 +14,9 @@
     "vite": "^4.4.9"
   },
   "scripts": {
-    "build": "tsc src/index.ts --outDir dist ",
-    "version": "pnpm  version patch -y",
+    "build": "tsc  -p tsconfig.json --outDir dist ",
     "package": "cp package.json ./dist ",
-    "publish": "pnpm publish dist --no-git-checks --access=public ",
+    "publish": "pnpm publish ./dist --no-git-checks --access=public ",
     "pub": "pnpm build && pnpm version && pnpm package && pnpm publish"
   },
   "devDependencies": {

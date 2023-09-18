@@ -6,7 +6,7 @@ import {injectStubs} from "./tools/stubs-injector";
 import {loadPackageJson, loadViteMetadata, mapping} from "./tools/nms";
 import {DtsScanner} from "./tools/parser";
 import {join} from "@angular/compiler-cli";
-import fs from "fs";
+
 
 const CACHE: { [key: string]: any } = {};
 const MAPPING: { [key: string]: string } = {};
@@ -30,7 +30,7 @@ export const TsCompilerPlugin: Plugin = {
 
         if (!isBuild) {
 
-            const dir = fs.pwd().toString();
+            const dir = process.cwd();
 
             const allow = ["@ngxs/store", "moment"]
 

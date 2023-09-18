@@ -8,7 +8,7 @@
         ],
         "strictNullChecks": true,
         "outDir": "lib",
-        "module": "esnext",
+        "module": "CommonJS",
         "target": "ESNext",
         "lib": [
             "ESNext"
@@ -25,10 +25,8 @@
     },
     "exclude": [
         "node_modules",
-        "lib",
-        "examples"
+        "dist"
     ],
-    "include": [
-      "./src"
-    ]
+    "include": ["src/**/*.ts"], // Specify the files to include in compilation
+
 }
