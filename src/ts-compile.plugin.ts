@@ -6,6 +6,7 @@ import {injectStubs} from "./tools/stubs-injector";
 import {loadPackageJson, loadViteMetadata, mapping} from "./tools/nms";
 import {DtsScanner} from "./tools/parser";
 import {join} from "@angular/compiler-cli";
+import fs from "fs";
 
 const CACHE: { [key: string]: any } = {};
 const MAPPING: { [key: string]: string } = {};
@@ -29,7 +30,7 @@ export const TsCompilerPlugin: Plugin = {
 
         if (!isBuild) {
 
-            const dir = "C:\\dev\\sources\\MAIN\\temp5\\frontends"
+            const dir = fs.pwd().toString();
 
             const allow = ["@ngxs/store", "moment"]
 
@@ -173,16 +174,11 @@ export const swcTransform = async ({code, id, isSsr, isProduction, typesCollecto
                 tsx: false,
                 decorators: true,
                 dynamicImport: true,
-
-
             },
             transform: {
                 decoratorMetadata: true,
                 legacyDecorator: true,
-
-
             },
-
             minify: minifyOptions,
         },
         minify: isProduction,
