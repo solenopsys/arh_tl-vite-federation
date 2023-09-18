@@ -14,7 +14,7 @@
     "vite": "^4.4.9"
   },
   "scripts": {
-    "build": "tsx src/index.ts --format cjs --outDir dist ",
+    "build": "tsc src/index.ts --outDir dist ",
     "version": "pnpm  version patch -y",
     "package": "cp package.json ./dist ",
     "publish": "pnpm publish dist --no-git-checks --access=public ",
@@ -22,9 +22,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.6.2",
-    "bumpp": "^8.2.1",
-    "tsx": "^3.12.10",
-    "turbo": "^1.10.14",
     "typescript": "^5.2.2",
     "vite-plugin-dts": "^3.5.3"
   }
