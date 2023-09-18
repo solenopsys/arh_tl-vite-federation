@@ -1,8 +1,6 @@
 import {Plugin} from 'vite';
 import {TsCompilerPlugin} from "./ts-compile.plugin";
 
-const currentDir = process.cwd();
-
 
 export function angular(injectStubs:string[] ): Plugin[] {
 
@@ -10,3 +8,5 @@ export function angular(injectStubs:string[] ): Plugin[] {
 
     return [TsCompilerPlugin]
 }
+
+export default angular;
