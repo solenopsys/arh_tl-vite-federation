@@ -15,7 +15,7 @@
   },
   "scripts": {
     "build": "tsx src/index.ts --format cjs --outDir dist ",
-    "version": "bumpp package.json ",
+    "version": "pnpm  version patch -y",
     "package": "cp package.json ./dist ",
     "publish": "pnpm publish dist --no-git-checks --access=public ",
     "pub": "pnpm build && pnpm version && pnpm package && pnpm publish"
