@@ -1,6 +1,6 @@
 {
   "name": "@solenopsys/vite-federation-plugin",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "description": "Vite plugin for Solenopsys monorepo",
   "type": "module",
   "peerDependencies": {
