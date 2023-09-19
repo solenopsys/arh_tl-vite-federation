@@ -5,7 +5,7 @@ import {TypesCollector} from "./visitors/types-map";
 import {injectStubs} from "./tools/stubs-injector";
 import {loadPackageJson, loadViteMetadata, mapping} from "./tools/nms";
 import {DtsScanner} from "./tools/parser";
-import {join} from "@angular/compiler-cli";
+import path from "path";
 
 
 const CACHE: { [key: string]: any } = {};
@@ -48,7 +48,7 @@ export const TsCompilerPlugin: Plugin = {
                     if (value && pkg?.typings) {
                         let dtsScanner = new DtsScanner();
                         let file = pkg?.typings.replace(".d.ts", "");
-                        const fp = join("./node_modules/", value, file)
+                        const fp = path.join("./node_modules/", value, file)
 
                         const res = await dtsScanner.startParse(dir, fp);
                         CACHE[value] = res;
