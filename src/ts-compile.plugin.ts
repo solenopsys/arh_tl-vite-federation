@@ -32,7 +32,7 @@ export const TsCompilerPlugin: Plugin = {
 
             const dir = process.cwd();
 
-            const allow = ["@ngxs/store", "moment"]
+          //  const allow = ["@ngxs/store", "moment"] // export
 
             let conf = loadViteMetadata(dir);
 
@@ -42,7 +42,7 @@ export const TsCompilerPlugin: Plugin = {
                 const value = map[key];
                 const pkg = loadPackageJson(dir, value);
 
-                if (allow.includes(value)) {
+              //  if (allow.includes(value)  ) {
                     MAPPING[key] = value;
 
                     if (value && pkg?.typings) {
@@ -54,7 +54,7 @@ export const TsCompilerPlugin: Plugin = {
                         CACHE[value] = res;
                     }
 
-                }
+               // }
 
             }
         }
