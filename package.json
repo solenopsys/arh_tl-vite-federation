@@ -1,10 +1,10 @@
 {
   "name": "@solenopsys/vite-federation-plugin",
-  "version": "0.1.19",
+  "version": "0.1.21",
   "description": "Vite plugin for Solenopsys monorepo",
   "main": "index.js",
   "types": "index.d.ts",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@angular-devkit/build-angular": "^16.2.2",
     "@angular/compiler": "^16.2.5",
@@ -16,9 +16,11 @@
     "vite": "^4.4.9"
   },
   "scripts": {
-    "pub": "rm -rf dist & tsc  -p tsconfig.json --outDir dist  && cp package.json ./dist && pnpm publish ./dist --no-git-checks --access=public"
+    "build": " esbuild ./src/index.ts --bundle  --platform=node --outfile=dist/index.js --packages=external && cp package.json dist/package.json",
+    "pub": "pnpm build && pnpm publish dist --no-git-checks --access=public"
   },
   "devDependencies": {
+    "esbuild": "0.18.17",
     "@types/node": "^20.6.2",
     "typescript": "^5.2.2",
     "vite-plugin-dts": "^3.5.3"
