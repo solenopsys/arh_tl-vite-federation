@@ -1,5 +1,5 @@
 import {Visitor} from "@swc/core/Visitor";
-import {Declaration, TsInterfaceDeclaration, TsTypeAliasDeclaration} from "@swc/core/types";
+import {Declaration, TsInterfaceDeclaration, TsTypeAliasDeclaration} from "@swc/types";
 import {TsType} from "@swc/core";
 
 export class TypesCollector extends Visitor {

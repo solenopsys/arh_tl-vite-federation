@@ -1,18 +1,19 @@
 import {
     Argument,
     CallExpression,
+    ClassDeclaration,
     Identifier,
     MemberExpression,
     ModuleItem,
     NamedImportSpecifier,
     TsParameterProperty,
-    TsType, VariableDeclarator,
+    TsType,
 } from '@swc/core';
-import {Visitor} from '@swc/core/Visitor.js';
+import { Visitor } from '@swc/core/Visitor.js';
 import {
     createIdentifer,
-    createImportSpecifier, createKeyValueProperty, createObjectExpression,
-    createSpan, createStringLiteral, createVariableDeclaration,
+    createImportSpecifier,
+    createSpan,
     isCallExpression,
     isIdentifer,
     isImportDeclaration,
@@ -26,12 +27,12 @@ const hasInjectDecorator = node =>
         dec =>
             isCallExpression(dec.expression) &&
             isIdentifer(dec.expression.callee) &&
-            dec.expression.callee.value === 'Inject'
+            dec.expression.callee.value === 'Inject',
     );
 
 function createCallExpression(
     callee: MemberExpression | Identifier,
-    args: Argument[] = []
+    args: Argument[] = [],
 ) {
     const object: CallExpression = {
         type: 'CallExpression',
@@ -42,11 +43,23 @@ function createCallExpression(
     return object;
 }
 
-
 export class AngularInjector extends Visitor {
     private hasInjectorImport = false;
     private hasInjectedConstructor = false;
-    private beforeClass: any;
+    private isAngularClass = false;
+
+    override visitClassDeclaration(decl: ClassDeclaration) {
+        this.isAngularClass = !!decl.decorators?.some(
+            dec =>
+                isCallExpression(dec.expression) &&
+                isIdentifer(dec.expression.callee) &&
+                ['NgModule', 'Component', 'Injectable', 'Directive'].includes(
+                    dec.expression.callee.value,
+                ),
+        );
+
+        return super.visitClassDeclaration(decl);
+    }
 
     override visitModuleItems(items: ModuleItem[]): ModuleItem[] {
         const result = items.flatMap(item => this.visitModuleItem(item));
@@ -65,23 +78,17 @@ export class AngularInjector extends Visitor {
         return result;
     }
 
-    override visitClass(n) { // todo need refactor
-        this.beforeClass = n;
-        return super.visitClass(n);
-    }
-
-
     override visitConstructorParameter(
-        node: TsParameterProperty
+        node: TsParameterProperty,
     ): TsParameterProperty {
         if (hasInjectDecorator(node) || !node.param || !node.param.typeAnnotation) {
             return node;
         } else {
             if (
+                this.isAngularClass &&
                 isTsTypeAnnotation(node.param.typeAnnotation) &&
                 isTsTypeReference(node.param.typeAnnotation.typeAnnotation) &&
-                isIdentifer(node.param.typeAnnotation.typeAnnotation.typeName) &&
-                this.beforeClass?.decorators?.length > 0 // todo need refactor
+                isIdentifer(node.param.typeAnnotation.typeAnnotation.typeName)
             ) {
                 node.decorators = node.decorators ?? [];
                 node.decorators.push({
@@ -90,7 +97,7 @@ export class AngularInjector extends Visitor {
                     expression: createCallExpression(createIdentifer('Inject'), [
                         {
                             expression: createIdentifer(
-                                node.param.typeAnnotation.typeAnnotation.typeName.value
+                                node.param.typeAnnotation.typeAnnotation.typeName.value,
                             ),
                         },
                     ]),
@@ -112,14 +119,11 @@ export class AngularInjector extends Visitor {
         return node;
     }
 
-    override visitTsTypes(nodes: (TsType | any)[]): TsType[] {
-
-
-
+    override visitTsTypes(nodes: TsType[]): TsType[] {
         return nodes;
     }
 
-    override visitTsType(node: TsType | any): TsType | any {
-        return node;
+    override visitTsType(nodes: TsType): TsType {
+        return nodes;
     }
 }

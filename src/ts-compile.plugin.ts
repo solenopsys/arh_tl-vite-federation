@@ -3,19 +3,18 @@ import {JsMinifyOptions, minify, Output, plugins, Program, transform} from "@swc
 import {AngularComponents, AngularInjector} from "./visitors";
 import {TypesCollector} from "./visitors/types-map";
 import {injectStubs} from "./tools/stubs-injector";
-import {loadPackageJson, loadViteMetadata, mapping} from "./tools/nms";
-import {DtsScanner} from "./tools/parser";
-import path from "path";
+import {CacheCoordinator} from "./cache_coord";
+import {libNameToPackageName} from "./tools/helpers";
 
+const NODE_MODULES = "node_modules";
 
-const CACHE: { [key: string]: any } = {};
-const MAPPING: { [key: string]: string } = {};
-
+const typesCache = new CacheCoordinator(process.cwd())
 
 export const TsCompilerPlugin: Plugin = {
 
     name: 'vite-plugin-ts-compile-plugin',
     enforce: "pre",
+
 
     apply(config, env) {
         const isBuild = env.command === 'build';
@@ -25,39 +24,7 @@ export const TsCompilerPlugin: Plugin = {
 
 
     async config(_userConfig, env: any) {
-        // console.log("CONFIG", _userConfig, env)
-        const isBuild = env.command === 'build';
 
-        if (!isBuild) {
-
-            const dir = process.cwd();
-
-          //  const allow = ["@ngxs/store", "moment"] // export
-
-            let conf = loadViteMetadata(dir);
-
-            let map = mapping(conf);
-
-            for (const key in map) {
-                const value = map[key];
-                const pkg = loadPackageJson(dir, value);
-
-              //  if (allow.includes(value)  ) {
-                    MAPPING[key] = value;
-
-                    if (value && pkg?.typings) {
-                        let dtsScanner = new DtsScanner();
-                        let file = pkg?.typings.replace(".d.ts", "");
-                        const fp = path.join("./node_modules/", value, file)
-
-                        const res = await dtsScanner.startParse(dir, fp);
-                        CACHE[value] = res;
-                    }
-
-               // }
-
-            }
-        }
 
         return {
             esbuild: false,
@@ -65,7 +32,6 @@ export const TsCompilerPlugin: Plugin = {
     },
 
     resolveId(id) {
-        //console.log('resolve', id)
         if (id === '/@angular/compiler') {
             return this.resolve('@angular/compiler');
         }
@@ -75,28 +41,19 @@ export const TsCompilerPlugin: Plugin = {
         return html.replace('</head>', `${compilerScript}</head>`);
     },
 
-    transform(code, id: any) {
-
-
-        if (id.includes('node_modules')) {
-
-            const map = MAPPING;
-            for (const key in map) {
-                const value = map[key];
-                if (id.includes(key)) {
-                    let mp = CACHE[value];
-                    if (mp) {
-
-                        return injectStubs(mp, code)
-                    }
-                }
+    async transform(code, id: any) {
+        if (id.includes(NODE_MODULES) && id.includes("vite/deps") && !id.includes('chunk')) {
+            const {packageName} = libNameToPackageName(id);
+            let libCacheExists = typesCache.isExists(packageName);
+            if (!libCacheExists) {
+                libCacheExists = await typesCache.loadPackage(id);
             }
-
-            //  console.log("MODULE", id)
+            if (libCacheExists) {
+                const mp = typesCache.getTypes(packageName);
+                return injectStubs(id, mp, code)
+            }
         }
         if (id.endsWith('.ts')) {
-
-
             return new Promise((resolve) => {
                 let typesCollector = new TypesCollector();
                 let promise: Promise<Output | undefined> = swcTransform({
@@ -113,8 +70,10 @@ export const TsCompilerPlugin: Plugin = {
                     let injectMap = typesCollector.getTypesMap();
 
                     let code = output?.code;
-                    if (output?.code)
-                        code = injectStubs(injectMap, output?.code)
+                    if (output?.code) {
+                        code = injectStubs(id, injectMap, output?.code)
+
+                    }
 
 
                     if (code && id.endsWith('modules-controller.ts'))
@@ -135,7 +94,6 @@ export const TsCompilerPlugin: Plugin = {
 }
 
 export const swcTransform = async ({code, id, isSsr, isProduction, typesCollector}): Promise<Output | undefined> => {
-    //  console.log("PROCESING", id)
     const minifyOptions: JsMinifyOptions = {
         compress: isProduction,
         mangle: isProduction,
@@ -146,7 +104,7 @@ export const swcTransform = async ({code, id, isSsr, isProduction, typesCollecto
         },
     };
 
-    if (id.includes('node_modules')) {
+    if (id.includes(NODE_MODULES)) {
 
         if (isProduction) {
             return minify(code, minifyOptions);

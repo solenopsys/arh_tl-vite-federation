@@ -1,8 +1,13 @@
-export function injectStubs(typesMap: { [key: string]: string }, code: string): string {
+export function injectStubs(id:string,typesMap: { [packageName: string]: string }, code: string): string {
     let stubs = "\n"
+
+
+
 
     if (Object.keys(typesMap).length === 0)
         return code;
+
+
 
 
     let cleanedMap: { [key: string]: string } = {}
@@ -11,8 +16,15 @@ export function injectStubs(typesMap: { [key: string]: string }, code: string): 
             cleanedMap[key] = typesMap[key]
     })
 
+
+
+
+
+
     if (Object.keys(cleanedMap).length === 0)
         return code;
+
+
 
     if (Object.keys(cleanedMap).length > 0) {
         stubs += Object.keys(cleanedMap).filter(key =>
@@ -21,6 +33,8 @@ export function injectStubs(typesMap: { [key: string]: string }, code: string): 
             return `export var ${key};\n`
         }).join("");
     }
+
+
 
 
     return code + "\n\n// Stubs for Vite to resolve types and interfaces." + stubs;

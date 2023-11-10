@@ -1,6 +1,6 @@
 import {Declaration, Module, ModuleItem, parseFile} from "@swc/core";
 import {dirname, join} from "path";
-import {ParseOptions} from "@swc/core/types";
+import {ParseOptions} from "@swc/types";
 import * as fs from 'fs';
 
 
